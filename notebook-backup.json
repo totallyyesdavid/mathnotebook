@@ -1,6 +1,19 @@
 {
   "notes": [
     {
+      "id": "note_8xjr9is_1788007461811",
+      "title": "GCD Lemmas",
+      "blocks": [
+        {
+          "type": "text",
+          "content": "$$\\gcd(a^m-b^m,\\ a^n-b^n) = a^{\\gcd(m,n)}-b^{\\gcd(m,n)}$$\n\n$$\\gcd(a^m-1,\\ a^n-1) = a^{\\gcd(m,n)}-1 \\quad (b=1 \\text{ case})$$\n\n$$\\gcd(F_m,F_n) = F_{\\gcd(m,n)} \\quad \\text{(Fibonacci case)}$$\n\n$$\\gcd(a^m+1,\\ a^n+1) = a^{\\gcd(m,n)}+1, \\quad \\text{only if } \\frac{m}{\\gcd(m,n)} \\text{ and } \\frac{n}{\\gcd(m,n)} \\text{ are both odd}$$\n\n$$\\text{Otherwise: } \\gcd(a^m+1,a^n+1) = \\begin{cases} 2 & a \\text{ odd} \\\\ 1 & a \\text{ even} \\end{cases}$$"
+        }
+      ],
+      "field": "NT",
+      "createdAt": "2026-08-29T12:44:21.811Z",
+      "updatedAt": "2026-08-29T12:44:21.811Z"
+    },
+    {
       "id": "note_pe46u19_1787985842931",
       "title": "Fermat's Christmas Theorem",
       "blocks": [
