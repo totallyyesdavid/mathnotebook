@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Notebook</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+    :root {
+      --bg:#f2f1ed; --card:#ffffff; --soft:#eceae5; --line:#e4e2db;
+      --muted:#8c8880; --text:#1a1916; --dark:#1a1916; --dark2:#2d2c28;
+      --A:#c2410c; --G:#15803d; --NT:#1d4ed8; --C:#7c3aed;
+      --A-bg:#fff4f0; --G-bg:#f0fdf4; --NT-bg:#eff6ff; --C-bg:#f5f3ff;
+      --A-bd:#fcd5c0; --G-bd:#bbf7d0; --NT-bd:#bfdbfe; --C-bd:#ddd6fe;
+      --easy-bg:#dcfce7; --easy-text:#166534; --easy-bd:#bbf7d0;
+      --mid-bg:#fef9c3;  --mid-text:#854d0e;  --mid-bd:#fde047;
+      --hard-bg:#fee2e2; --hard-text:#991b1b; --hard-bd:#fca5a5;
+      --r:16px; --rl:22px; --sh:0 2px 10px rgba(26,25,22,.06); --shm:0 4px 20px rgba(26,25,22,.09);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    button,input,select,textarea{font:inherit;}
+    img{display:block;max-width:100%;}
+    .app{max-width:1360px;margin:0 auto;padding:18px;}
+
+    /* topbar */
+    .topbar{background:var(--dark);border-radius:20px;padding:14px 22px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+    .brand{display:flex;align-items:center;gap:11px;}
+    .brand-icon{width:34px;height:34px;border-radius:9px;background:var(--A);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:15px;color:#fff;font-weight:500;}
+    .brand-name{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.02em;}
+    .brand-sub{font-size:11px;color:#6b6960;font-family:'DM Mono',monospace;margin-top:1px;}
+    .nav{display:flex;gap:5px;flex-wrap:wrap;}
+    .nav-btn{border:1px solid #383730;background:transparent;color:#a09d96;border-radius:10px;padding:7px 15px;cursor:pointer;font-weight:600;font-size:13px;transition:.13s;}
+    .nav-btn:hover{background:#28261f;color:#fff;border-color:#484640;}
+    .nav-btn.active{background:#fff;color:var(--dark);border-color:#fff;}
+    .nav-btn.nA.active{background:var(--A);border-color:var(--A);color:#fff;}
+    .nav-btn.nG.active{background:var(--G);border-color:var(--G);color:#fff;}
+    .nav-btn.nNT.active{background:var(--NT);border-color:var(--NT);color:#fff;}
+    .nav-btn.nC.active{background:var(--C);border-color:var(--C);color:#fff;}
+    .save-btn{background:var(--A);color:#fff;border:none;border-radius:10px;padding:8px 16px;cursor:pointer;font-weight:700;font-size:13px;transition:.13s;}
+    .save-btn:hover{opacity:.88;}
+
+    /* status bar */
+    .statusbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 16px;margin-bottom:18px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;}
+    .statusbar-left{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+    .statusbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .save-dot{width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;margin-right:6px;}
+    .save-dot.warn{background:#d97706;}
+    .save-dot.err{background:#dc2626;}
+    .storage-track{width:70px;height:5px;background:var(--soft);border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;margin:0 6px;}
+    .storage-fill{height:100%;background:#16a34a;border-radius:99px;transition:width .2s;}
+    .storage-fill.warn{background:#d97706;}
+    .storage-fill.err{background:#dc2626;}
+    .save-banner{background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;border-radius:14px;padding:11px 16px;margin-bottom:18px;font-size:13px;line-height:1.6;font-weight:600;}
+
+    /* buttons */
+    .btn{border:1px solid var(--line);background:var(--card);color:#374151;border-radius:10px;padding:8px 13px;cursor:pointer;font-weight:600;font-size:13px;transition:.13s;white-space:nowrap;}
+    .btn:hover{background:var(--soft);}
+    .btn.primary{background:var(--dark);color:#fff;border-color:var(--dark);}
+    .btn.primary:hover{background:var(--dark2);}
+    .btn.danger{background:#dc2626;color:#fff;border-color:#dc2626;}
+    .btn.danger:hover{background:#b91c1c;}
+    .btn.sm{padding:5px 10px;font-size:12px;border-radius:8px;}
+    .btn.active{background:var(--dark);color:#fff;border-color:var(--dark);}
+    .btn.ghost{background:transparent;border-color:transparent;color:var(--muted);}
+    .btn.ghost:hover{background:var(--soft);color:var(--text);border-color:var(--line);}
+    .btn-row{display:flex;flex-wrap:wrap;gap:7px;align-items:center;}
+
+    /* cards */
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--rl);box-shadow:var(--sh);padding:18px;}
+    .card-title{font-size:16px;font-weight:700;letter-spacing:-.015em;}
+    .card-sub{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5;}
+    .card-hdr{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;}
+    .stack>*+*{margin-top:16px;}
+    .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+    .hidden{display:none!important;}
+
+    /* forms */
+    .lbl{display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;font-family:'DM Mono',monospace;}
+    .inp,.sel,.ta{width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 11px;outline:none;color:var(--text);font-size:14px;}
+    .inp:focus,.sel:focus,.ta:focus{border-color:#94a3b8;box-shadow:0 0 0 3px rgba(148,163,184,.1);}
+    .ta{resize:vertical;min-height:90px;line-height:1.75;}
+    .fg{margin-bottom:14px;}
+    .og3{display:grid;gap:7px;grid-template-columns:repeat(3,1fr);}
+    .ob{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;font-weight:600;font-size:13px;color:#374151;transition:.13s;}
+    .ob:hover{background:var(--soft);}
+    .ob.active{background:var(--dark);color:#fff;border-color:var(--dark);}
+
+    /* upload */
+    .dz{min-height:100px;border:2px dashed #d1d5db;border-radius:14px;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;cursor:pointer;transition:.13s;background:var(--soft);}
+    .dz:hover,.dz.over{border-color:var(--dark);background:#f0ede8;}
+    .dz strong{font-size:13px;color:#374151;display:block;}
+    .dz p{font-size:12px;color:var(--muted);margin-top:3px;}
+    .tgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px;}
+    .ti{border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative;}
+    .ti img{width:100%;height:140px;object-fit:cover;}
+    .ti-rm{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:6px;padding:3px 7px;font-size:11px;cursor:pointer;}
+
+    /* pills */
+    .pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;border:1px solid var(--line);background:var(--soft);color:#475569;letter-spacing:.02em;}
+    .pill.easy{background:var(--easy-bg);color:var(--easy-text);border-color:var(--easy-bd);}
+    .pill.mid{background:var(--mid-bg);color:var(--mid-text);border-color:var(--mid-bd);}
+    .pill.hard{background:var(--hard-bg);color:var(--hard-text);border-color:var(--hard-bd);}
+    .fb{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:.04em;}
+    .fbA{background:var(--A-bg);color:var(--A);border:1px solid var(--A-bd);}
+    .fbG{background:var(--G-bg);color:var(--G);border:1px solid var(--G-bd);}
+    .fbNT{background:var(--NT-bg);color:var(--NT);border:1px solid var(--NT-bd);}
+    .fbC{background:var(--C-bg);color:var(--C);border:1px solid var(--C-bd);}
+
+    /* empty */
+    .eb{border:1px dashed #d1d5db;background:var(--soft);border-radius:14px;padding:18px;color:var(--muted);font-size:13px;line-height:1.7;}
+
+    /* field layout */
+    .fl{display:grid;grid-template-columns:260px minmax(0,1fr);gap:18px;}
+
+    /* note sidebar */
+    .nsi{display:flex;flex-direction:column;gap:8px;}
+    .ni{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;cursor:pointer;transition:.13s;}
+    .ni:hover{box-shadow:var(--shm);transform:translateY(-1px);}
+    .ni-title{font-weight:700;font-size:14px;}
+    .ni-meta{font-size:12px;color:var(--muted);margin-top:3px;font-family:'DM Mono',monospace;}
+
+    /* note editor */
+    .ne-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--rl);padding:18px;}
+    .ne-title{font-size:22px;font-weight:700;width:100%;border:none;background:transparent;outline:none;color:var(--text);padding:0;letter-spacing:-.02em;border-bottom:2px solid var(--line);padding-bottom:10px;margin-bottom:16px;}
+    .ne-title:focus{border-bottom-color:var(--dark);}
+    .ne-title::placeholder{color:#d1d5db;}
+
+    /* block editor */
+    .block-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+    .block-item{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);position:relative;}
+    .block-item.drag-over{outline:2px solid var(--dark);outline-offset:2px;}
+    .block-bar{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--soft);border-bottom:1px solid var(--line);}
+    .block-bar .mini{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;}
+    .block-ta{width:100%;border:none;background:transparent;outline:none;color:var(--text);font-size:14px;line-height:1.8;resize:none;min-height:80px;padding:12px;font-family:'DM Mono',monospace;}
+    .block-img-wrap{padding:0;}
+    .block-img-wrap img{width:100%;display:block;}
+    .block-add-row{display:flex;gap:8px;margin-top:4px;}
+
+    /* note rendered */
+    .note-view{display:flex;flex-direction:column;gap:16px;}
+    .note-view-text{font-size:14px;line-height:1.9;color:#1e293b;}
+    .note-view-text .katex-display{margin:.8em 0;overflow-x:auto;}
+    .note-view-img img{width:100%;border-radius:14px;border:1px solid var(--line);}
+
+    /* problem cards */
+    .pstack{display:flex;flex-direction:column;gap:12px;}
+    .pc{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+    .pc-img{width:100%;display:block;background:#f8f7f4;}
+    .pc-body{padding:12px 14px;}
+    .pc-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;}
+    .pc-toggle{width:100%;border:none;background:var(--soft);color:var(--muted);padding:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:.04em;transition:.13s;border-top:1px solid var(--line);}
+    .pc-toggle:hover{background:#e5e2db;color:var(--text);}
+    .pc-detail{padding:14px;border-top:1px solid var(--line);background:#fdfdfc;}
+    .sol-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px;}
+    .sol-grid img{border-radius:10px;width:100%;}
+
+    /* sort bar */
+    .sort-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .sort-lbl{font-size:12px;font-weight:700;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;}
+
+    /* prob form */
+    .pfg{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;}
+
+    /* lib */
+    .ll{display:grid;grid-template-columns:240px minmax(0,1fr);gap:18px;}
+
+    /* tags */
+    .tg2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+    .tri{display:flex;gap:8px;align-items:center;margin-top:8px;}
+    .tri .inp{flex:1;}
+
+    /* char */
+    .cc{text-align:right;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px;}
+
+    /* latex hint */
+    .latex-hint{background:var(--soft);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.8;margin-bottom:10px;}
+
+    /* segmented toggle (image / text-latex) */
+    .tab-row{display:inline-flex;gap:2px;background:var(--soft);border-radius:10px;padding:3px;}
+    .tab-btn{border:none;background:transparent;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);transition:.13s;font-family:'DM Mono',monospace;letter-spacing:.02em;}
+    .tab-btn:hover{color:var(--text);}
+    .tab-btn.active{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.14);}
+
+    /* responsive */
+    @media(max-width:960px){.fl,.ll,.pfg,.tg2{grid-template-columns:1fr;}}
+    @media(max-width:680px){.app{padding:10px;}.topbar{padding:12px 14px;}.ne-title{font-size:18px;}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">∑</div>
+      <div>
+        <div class="brand-name">Math Notebook</div>
+        <div class="brand-sub">notes + corrections</div>
+      </div>
+    </div>
+    <div class="nav" id="main-nav">
+      <button class="nav-btn nA"  data-nav="A">A</button>
+      <button class="nav-btn nG"  data-nav="G">G</button>
+      <button class="nav-btn nNT" data-nav="NT">NT</button>
+      <button class="nav-btn nC"  data-nav="C">C</button>
+      <button class="nav-btn" data-nav="library">Library</button>
+      <button class="nav-btn" data-nav="tags">Tags</button>
+      <button class="nav-btn" data-nav="github">GitHub</button>
+    </div>
+    <button class="save-btn" id="btn-save">⇩ Share as HTML</button>
+  </div>
+  <div id="save-banner"></div>
+  <div id="katex-banner"></div>
+  <div class="statusbar" id="statusbar"></div>
+  <div id="vroot"></div>
+</div>
+
+<script id="notebook-data" type="application/json">
+{"notes":[],"problems":[],"tags":[]}
+</script>
+
+<script>
+// ── DATA ──
+const LS_KEY='math_notebook_v1';                 // legacy/fallback localStorage key
+const LS_META_KEY='math_notebook_meta_v1';        // small metadata, always in localStorage
+const IDB_NAME='math_notebook_db';
+const IDB_STORE='notebook';
+const IDB_KEY='main';
+const STORAGE_SOFT_LIMIT=5*1024*1024; // used only when falling back to localStorage
+
+let idbAvailable=null; // null=untested, true/false once known this session
+
+function idbOpen(){
+  return new Promise((resolve,reject)=>{
+    if(!window.indexedDB){reject(new Error('no indexedDB'));return;}
+    const req=indexedDB.open(IDB_NAME,1);
+    req.onupgradeneeded=()=>{
+      const db=req.result;
+      if(!db.objectStoreNames.contains(IDB_STORE))db.createObjectStore(IDB_STORE);
+    };
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error||new Error('indexedDB open failed'));
+  });
+}
+async function idbGet(){
+  const db=await idbOpen();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(IDB_STORE,'readonly');
+    const req=tx.objectStore(IDB_STORE).get(IDB_KEY);
+    req.onsuccess=()=>resolve(req.result||null);
+    req.onerror=()=>reject(req.error||new Error('indexedDB read failed'));
+  });
+}
+async function idbSet(value){
+  const db=await idbOpen();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(IDB_STORE,'readwrite');
+    tx.objectStore(IDB_STORE).put(value,IDB_KEY);
+    tx.oncomplete=()=>resolve(true);
+    tx.onerror=()=>reject(tx.error||new Error('indexedDB write failed'));
+  });
+}
+
+async function loadInitialData(){
+  // 1. IndexedDB — primary store, much larger quota than localStorage
+  try{
+    const idb=await idbGet();
+    idbAvailable=true;
+    if(idb)return{notes:idb.notes||[],problems:idb.problems||[],tags:idb.tags||[]};
+  }catch{
+    idbAvailable=false;
+  }
+  // 2. legacy localStorage key — migrate forward if present (older version of this file, or IndexedDB unsupported here)
+  try{
+    const ls=localStorage.getItem(LS_KEY);
+    if(ls){
+      const d=JSON.parse(ls);
+      const data={notes:d.notes||[],problems:d.problems||[],tags:d.tags||[]};
+      if(idbAvailable)idbSet(data).catch(()=>{}); // best-effort migration into IndexedDB
+      return data;
+    }
+  }catch{}
+  // 3. baked-in JSON island — opened from a file someone shared
+  try{const d=JSON.parse(document.getElementById('notebook-data').textContent);return{notes:d.notes||[],problems:d.problems||[],tags:d.tags||[]};}
+  catch{return{notes:[],problems:[],tags:[]};}
+}
+
+function loadMeta(){
+  try{return JSON.parse(localStorage.getItem(LS_META_KEY))||{};}catch{return{};}
+}
+function saveMeta(patch){
+  try{localStorage.setItem(LS_META_KEY,JSON.stringify({...loadMeta(),...patch}));}catch{}
+}
+
+async function refreshStorageEstimate(){
+  if(navigator.storage&&navigator.storage.estimate){
+    try{
+      const est=await navigator.storage.estimate();
+      S.storageEstimate={usage:est.usage||0,quota:est.quota||0};
+      return;
+    }catch{}
+  }
+  S.storageEstimate=null;
+}
+
+async function persist(){
+  const payload={notes:S.notes,problems:S.problems,tags:S.tags};
+  const json=JSON.stringify(payload);
+  S.lastDataSize=new Blob([json]).size;
+
+  let ok=false;
+  if(idbAvailable!==false){
+    try{
+      await idbSet(payload);
+      ok=true;idbAvailable=true;
+      S.storageBackend='indexeddb';
+    }catch{
+      idbAvailable=false; // stop retrying IndexedDB this session
+    }
+  }
+  if(!ok){
+    try{
+      localStorage.setItem(LS_KEY,json);
+      ok=true;
+      S.storageBackend='localstorage';
+    }catch{
+      ok=false;
+    }
+  }
+
+  if(ok){
+    S.saveStatus='ok';S.saveError='';
+    S.lastSavedAt=Date.now();
+    saveMeta({lastSavedAt:S.lastSavedAt});
+  }else{
+    S.saveStatus='error';
+    S.saveError='Auto-save failed in this browser. This change was NOT saved automatically.';
+  }
+  await refreshStorageEstimate();
+  renderStatusBar();
+}
+
+function shareAsHtml(){
+  // bakes current data into a full HTML copy for sending to someone else.
+  // this is NOT how your own data gets saved — that happens automatically via IndexedDB on every change.
+  const json=JSON.stringify({notes:S.notes,problems:S.problems,tags:S.tags});
+  const html=document.documentElement.outerHTML.replace(
+    /(<script id="notebook-data"[^>]*>)([\s\S]*?)(<\/script>)/,
+    '$1\n'+json+'\n$3'
+  );
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  a.download='math_notebook.html';a.click();URL.revokeObjectURL(a.href);
+}
+
+function exportJSON(){
+  // lightweight data-only backup, for restoring or moving to another browser/device
+  const json=JSON.stringify({notes:S.notes,problems:S.problems,tags:S.tags},null,2);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+  const ts=new Date().toISOString().slice(0,10);
+  a.download='math_notebook_backup_'+ts+'.json';
+  a.click();URL.revokeObjectURL(a.href);
+  S.lastExportedAt=Date.now();
+  saveMeta({lastExportedAt:S.lastExportedAt});
+  renderStatusBar();
+}
+
+function importJSON(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    let data;
+    try{data=JSON.parse(reader.result);}
+    catch{alert('That file is not valid JSON.');return;}
+    if(!data||!Array.isArray(data.notes)||!Array.isArray(data.problems)||!Array.isArray(data.tags)){
+      alert('That file does not look like a Math Notebook backup.');
+      return;
+    }
+    const ok=confirm(
+      'Importing will REPLACE everything currently in the notebook ('+S.notes.length+' notes, '+S.problems.length+' problems) '+
+      'with this file\'s contents ('+data.notes.length+' notes, '+data.problems.length+' problems). This cannot be undone.\n\nContinue?'
+    );
+    if(!ok)return;
+    S.notes=data.notes;S.problems=data.problems;S.tags=data.tags||[];
+    S.selNoteId=null;S.editing=false;S.probFormOpen=false;
+    persist();
+    nav(S.field);
+  };
+  reader.readAsText(file);
+}
+
+// ── STATUS BAR ──
+function fmtBytes(b){
+  if(b<1024)return b+' B';
+  if(b<1024*1024)return (b/1024).toFixed(1)+' KB';
+  return (b/(1024*1024)).toFixed(2)+' MB';
+}
+function fmtAgo(ts){
+  if(!ts)return 'never';
+  const s=Math.floor((Date.now()-ts)/1000);
+  if(s<5)return 'just now';
+  if(s<60)return s+'s ago';
+  const m=Math.floor(s/60);
+  if(m<60)return m+'m ago';
+  const h=Math.floor(m/60);
+  if(h<24)return h+'h ago';
+  return Math.floor(h/24)+'d ago';
+}
+
+function renderStatusBar(){
+  const bar=document.getElementById('statusbar');
+  const banner=document.getElementById('save-banner');
+  if(!bar)return;
+
+  const bytes=S.lastDataSize||0;
+  let meterHtml='';
+  let level='';
+
+  if(S.storageBackend==='indexeddb'&&S.storageEstimate&&S.storageEstimate.quota){
+    const{usage,quota}=S.storageEstimate;
+    const pct=quota?Math.min(100,(usage/quota)*100):0;
+    level=pct>90?'err':pct>75?'warn':'';
+    meterHtml=`${fmtBytes(bytes)} notebook data<span class="storage-track"><span class="storage-fill ${level}" style="width:${pct}%;"></span></span>${fmtBytes(usage)} / ${fmtBytes(quota)} browser storage`;
+  }else if(S.storageBackend==='indexeddb'){
+    meterHtml=`${fmtBytes(bytes)} notebook data · IndexedDB active (large capacity)`;
+  }else if(S.storageBackend==='localstorage'){
+    const pct=Math.min(100,(bytes/STORAGE_SOFT_LIMIT)*100);
+    level=pct>90?'err':pct>70?'warn':'';
+    meterHtml=`${fmtBytes(bytes)} used<span class="storage-track"><span class="storage-fill ${level}" style="width:${pct}%;"></span></span>~5 MB limit (fallback mode)`;
+  }else{
+    meterHtml=`${fmtBytes(bytes)} notebook data`;
+  }
+
+  const dotClass=S.saveStatus==='error'?'err':level;
+
+  bar.innerHTML=`
+    <div class="statusbar-left">
+      <span><span class="save-dot ${dotClass}"></span>${S.saveStatus==='error'?'Save failed':'Auto-saved '+fmtAgo(S.lastSavedAt)}</span>
+      <span>${meterHtml}</span>
+      <span>Last JSON backup: ${fmtAgo(S.lastExportedAt)}</span>
+    </div>
+    <div class="statusbar-right">
+      <button class="btn sm" id="btn-export-json">⇩ Export JSON</button>
+      <button class="btn sm" id="btn-import-json">⇧ Import JSON</button>
+      <input type="file" id="import-json-input" accept="application/json" class="hidden" />
+    </div>
+  `;
+  document.getElementById('btn-export-json').onclick=exportJSON;
+  const impBtn=document.getElementById('btn-import-json');
+  const impInput=document.getElementById('import-json-input');
+  impBtn.onclick=()=>impInput.click();
+  impInput.onchange=e=>{
+    const f=e.target.files[0];
+    if(f)importJSON(f);
+    impInput.value='';
+  };
+
+  if(S.saveStatus==='error'){
+    banner.innerHTML=`<div class="save-banner">⚠ ${esc(S.saveError)} Click "Export JSON" now to back up what you have.</div>`;
+  }else if(S.storageBackend==='localstorage'){
+    banner.innerHTML=`<div class="save-banner" style="background:#fef9c3;border-color:#fde047;color:#854d0e;">ℹ Using standard browser storage (~5 MB limit) because IndexedDB isn't reachable in this context. Export JSON regularly as backup.</div>`;
+  }else{
+    banner.innerHTML='';
+  }
+}
+
+// ── CONSTANTS ──
+const FIELDS=[{v:'A',l:'Algebra'},{v:'G',l:'Geometry'},{v:'NT',l:'Number Theory'},{v:'C',l:'Combinatorics'}];
+const FMAP=Object.fromEntries(FIELDS.map(f=>[f.v,f.l]));
+const DIFFS=['Easy','Mid','Hard'];
+const SOURCES=['AMC','AIME','Other'];
+
+// ── STATE ──
+const meta=loadMeta();
+const S={
+  notes:[], problems:[], tags:[], // populated async by boot() before first render
+  view:'A', field:'A',
+  selNoteId:null,
+  editing:false,
+  nForm:enf('A'),
+  probFormOpen:false, pForm:epf(null,'A'),
+  inlineTag:{name:'',field:'A'},
+  probSort:'all',
+  expanded:new Set(),
+  libFilters:{field:'all',diff:'all',src:'all',tagId:'all'},
+  libExp:new Set(),
+  tagDraft:{name:'',field:'A'},
+  saveStatus:'ok', saveError:'',
+  lastSavedAt:meta.lastSavedAt||null,
+  lastExportedAt:meta.lastExportedAt||null,
+  lastDataSize:0,
+  storageBackend:null,     // 'indexeddb' | 'localstorage', set once known
+  storageEstimate:null,    // {usage,quota} from navigator.storage.estimate()
+  katexOk:true,            // set by ensureKatex() at boot
+};
+
+function enf(field){
+  return{id:null,title:'',blocks:[],field:field||'A',createdAt:'',updatedAt:''};
+}
+function epf(noteId,field){
+  return{id:null,noteId:noteId||null,questionType:'text',questionImage:'',questionText:'',solutionType:'text',solutionImages:[],solutionText:'',field:field||'A',difficulty:'',sourceType:'',sourceDetail:'',techniqueTagIds:[],note:'',createdAt:'',updatedAt:''};
+}
+function uid(p){return(p||'x')+'_'+Math.random().toString(36).slice(2,9)+'_'+Date.now();}
+
+// ── HELPERS ──
+function esc(s){return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');}
+function fmt(v){try{return new Date(v).toLocaleDateString();}catch{return v;}}
+function dc(d){return d==='Easy'?'easy':d==='Mid'?'mid':d==='Hard'?'hard':'';}
+function tmap(){const m={};S.tags.forEach(t=>m[t.id]=t);return m;}
+function f2url(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(f);});}
+function rk(el){
+  if(!el||!window.renderMathInElement)return;
+  renderMathInElement(el,{
+    delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],
+    throwOnError:false,
+  });
+}
+
+// ── KaTeX availability check + fallback CDN + retry ──
+function loadScriptTag(src){
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src=src;s.onload=resolve;s.onerror=()=>reject(new Error('failed to load '+src));
+    document.head.appendChild(s);
+  });
+}
+function loadStyleTag(href){
+  return new Promise((resolve,reject)=>{
+    const l=document.createElement('link');
+    l.rel='stylesheet';l.href=href;l.onload=resolve;l.onerror=()=>reject(new Error('failed to load '+href));
+    document.head.appendChild(l);
+  });
+}
+async function ensureKatex(){
+  if(window.renderMathInElement)return true;
+  await new Promise(r=>setTimeout(r,400)); // give the <head> script tags a moment, in case they're just slow
+  if(window.renderMathInElement)return true;
+  try{
+    await loadStyleTag('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css');
+    await loadScriptTag('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js');
+    await loadScriptTag('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js');
+  }catch{}
+  return !!window.renderMathInElement;
+}
+function renderKatexBanner(){
+  const el=document.getElementById('katex-banner');
+  if(!el)return;
+  if(S.katexOk){el.innerHTML='';return;}
+  el.innerHTML=`<div class="save-banner" style="background:#fef9c3;border-color:#fde047;color:#854d0e;">
+    ⚠ Math rendering didn't load — LaTeX will show as raw text ($$...$$) instead of rendered equations. Your data is fine.
+    <button class="btn sm" id="katex-retry" style="margin-left:8px;">Try again</button>
+  </div>`;
+  const btn=document.getElementById('katex-retry');
+  if(btn)btn.onclick=async()=>{
+    S.katexOk=await ensureKatex();
+    renderKatexBanner();
+    render(); // re-render current view so already-visible text re-attempts rendering
+  };
+}
+
+function noteProbs(noteId,diff){
+  let ps=S.problems.filter(p=>p.noteId===noteId);
+  if(diff&&diff!=='all')ps=ps.filter(p=>p.difficulty===diff);
+  return ps;
+}
+
+// ── ROUTER ──
+function nav(view){
+  S.view=view;
+  if(FIELDS.some(f=>f.v===view)){S.field=view;S.selNoteId=null;S.editing=false;S.probFormOpen=false;S.probSort='all';S.expanded=new Set();}
+  document.querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===view));
+  render();
+}
+function render(){
+  persist();
+  const r=document.getElementById('vroot');
+  if(FIELDS.some(f=>f.v===S.view)){r.innerHTML=buildField();bindField();}
+  else if(S.view==='library'){r.innerHTML=buildLib();bindLib();}
+  else if(S.view==='tags'){r.innerHTML=buildTags();bindTags();}
+  else if(S.view==='github'){r.innerHTML=buildGithub();bindGithub();}
+}
+
+// ── FIELD VIEW ──
+function buildField(){
+  const f=S.field;
+  const notes=S.notes.filter(n=>n.field===f).sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt));
+  const sel=notes.find(n=>n.id===S.selNoteId)||null;
+  return`<div class="fl">
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;">${f} · ${FMAP[f]}</div>
+        <button class="btn sm primary" id="btn-new-note">+ Note</button>
+      </div>
+      <div class="nsi">
+        ${notes.length===0?`<div class="eb">No notes yet.</div>`:
+          notes.map(n=>{
+            const active=S.selNoteId===n.id;
+            const cnt=noteProbs(n.id).length;
+            return`<div class="ni${active?' active':''}" data-sel-note="${n.id}" style="${active?`border-color:var(--${f}-bd);background:var(--${f}-bg);`:''}">
+              <div class="ni-title" style="${active?`color:var(--${f});`:''}">${esc(n.title)||'(Untitled)'}</div>
+              <div class="ni-meta">${cnt} problem${cnt!==1?'s':''} · ${fmt(n.updatedAt)}</div>
+            </div>`;
+          }).join('')}
+      </div>
+    </div>
+    <div class="stack">
+      ${S.editing?buildNoteEditor():sel?buildNoteDetail(sel):`<div class="eb" style="padding:28px;text-align:center;">Select or create a note.</div>`}
+    </div>
+  </div>`;
+}
+
+// ── NOTE EDITOR (block-based) ──
+function buildNoteEditor(){
+  const f=S.nForm;
+  const blocks=f.blocks||[];
+  return`<div class="ne-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;">Edit note</div>
+      <div class="btn-row">
+        <button class="btn sm" id="n-cancel">Cancel</button>
+        <button class="btn sm primary" id="n-save">Save</button>
+      </div>
+    </div>
+    <input class="ne-title" id="ne-title" placeholder="Topic title..." value="${esc(f.title)}" />
+    <div class="latex-hint">Text blocks: use $x^2$ for inline and $$x^2$$ for display math</div>
+    ${blocks.length>0?`<div class="block-list" id="block-list">
+      ${blocks.map((b,i)=>buildBlockEdit(b,i,blocks.length)).join('')}
+    </div>`:''}
+    <div class="block-add-row">
+      <button class="btn sm primary" id="add-text-block">+ Text</button>
+      <button class="btn sm" id="add-img-block">+ Image</button>
+      <input id="block-img-fi" type="file" accept="image/*" multiple class="hidden" />
+    </div>
+  </div>`;
+}
+
+function buildBlockEdit(b,i,total){
+  const isText=b.type==='text';
+  return`<div class="block-item" draggable="true" data-bi="${i}">
+    <div class="block-bar">
+      <span class="mini">${isText?'Text / LaTeX':'Image'}</span>
+      <div class="btn-row">
+        ${i>0?`<button class="btn sm ghost" data-b-up="${i}">↑</button>`:''}
+        ${i<total-1?`<button class="btn sm ghost" data-b-dn="${i}">↓</button>`:''}
+        <button class="btn sm danger" data-b-rm="${i}">✕</button>
+      </div>
+    </div>
+    ${isText
+      ?`<textarea class="block-ta" data-b-ta="${i}" placeholder="Text or LaTeX here...">${esc(b.content||'')}</textarea>`
+      :`<div class="block-img-wrap"><img src="${b.src}" alt="Block image ${i+1}" /></div>`}
+  </div>`;
+}
+
+// ── NOTE DETAIL ──
+function buildNoteDetail(note){
+  const tm=tmap();
+  const allP=noteProbs(note.id);
+  const filtP=noteProbs(note.id,S.probSort);
+  const blocks=note.blocks||[];
+  return`
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div style="font-size:22px;font-weight:700;letter-spacing:-.02em;">${esc(note.title)||'(Untitled)'}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px;font-family:'DM Mono',monospace;">${fmt(note.updatedAt)}</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn sm" id="n-edit-btn">Edit note</button>
+          <button class="btn sm danger" id="n-del-btn">Delete note</button>
+        </div>
+      </div>
+      ${blocks.length===0
+        ?`<div style="color:var(--muted);font-size:13px;font-style:italic;">No content yet.</div>`
+        :`<div class="note-view" id="note-view-blocks">
+            ${blocks.map((b,i)=>b.type==='text'
+              ?`<div class="note-view-text" data-view-text="${i}"></div>`
+              :`<div class="note-view-img"><img src="${b.src}" alt="Note image" /></div>`
+            ).join('')}
+          </div>`}
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">Problems</div>
+          <div class="card-sub">${allP.length} total</div>
+        </div>
+        <div class="btn-row">
+          <div class="sort-bar">
+            <span class="sort-lbl">Difficulty:</span>
+            ${['all','Easy','Mid','Hard'].map(d=>`<button class="btn sm${S.probSort===d?' active':''}" data-sort="${d}">${d==='all'?'All':d}</button>`).join('')}
+          </div>
+          <button class="btn sm primary" id="btn-add-prob">+ Problem</button>
+        </div>
+      </div>
+      ${S.probFormOpen?buildProbForm():''}
+      ${filtP.length===0
+        ?`<div class="eb">${allP.length===0?'No problems yet.':'No problems matching this filter.'}</div>`
+        :`<div class="pstack">${filtP.map(p=>buildProbCard(p,tm)).join('')}</div>`}
+    </div>`;
+}
+
+// ── PROBLEM CARD ──
+// ── shared problem question/solution renderers (image or text/LaTeX) ──
+function probQuestionHtml(p){
+  if(p.questionType==='text'){
+    return `<div class="nr" style="padding:14px;" data-prob-qtext="${p.id}"></div>`;
+  }
+  return p.questionImage
+    ?`<img class="pc-img" src="${p.questionImage}" alt="Q" />`
+    :`<div style="padding:14px;background:var(--soft);color:var(--muted);font-size:13px;">No image</div>`;
+}
+function probSolutionCount(p){
+  return p.solutionType==='text' ? (p.solutionText&&p.solutionText.trim()?1:0) : p.solutionImages.length;
+}
+function probSolutionDetailHtml(p){
+  if(p.solutionType==='text'){
+    return (p.solutionText&&p.solutionText.trim())
+      ?`<div class="pc-detail"><div class="nr" data-prob-stext="${p.id}"></div></div>`
+      :'';
+  }
+  return p.solutionImages.length
+    ?`<div class="pc-detail"><div class="sol-grid">${p.solutionImages.map((src,i)=>`<img src="${src}" alt="Sol ${i+1}" />`).join('')}</div></div>`
+    :'';
+}
+
+function buildProbCard(p,tm){
+  const exp=S.expanded.has(p.id);
+  const tags=p.techniqueTagIds.map(id=>tm[id]).filter(Boolean);
+  return`<div class="pc" data-pid="${p.id}">
+    ${probQuestionHtml(p)}
+    <div class="pc-body">
+      <div class="pc-meta">
+        <span class="pill ${dc(p.difficulty)}">${esc(p.difficulty)}</span>
+        <span class="pill">${esc(p.sourceType)}</span>
+        ${p.sourceDetail?`<span class="pill">${esc(p.sourceDetail)}</span>`:''}
+        ${tags.map(t=>`<span class="pill">${esc(t.name)}</span>`).join('')}
+      </div>
+      ${p.note?`<div style="font-size:13px;color:#475569;line-height:1.6;margin-bottom:8px;">${esc(p.note)}</div>`:''}
+      <div class="btn-row">
+        <button class="btn sm ghost" data-p-edit="${p.id}">Edit</button>
+        <button class="btn sm ghost" data-p-del="${p.id}">Delete</button>
+      </div>
+    </div>
+    <button class="pc-toggle" data-p-toggle="${p.id}">${exp?'▲ Hide solution':'▼ Show solution'} (${probSolutionCount(p)})</button>
+    ${exp?probSolutionDetailHtml(p):''}
+  </div>`;
+}
+
+// ── PROBLEM FORM ──
+function buildProbForm(){
+  const f=S.pForm;
+  const avail=S.tags.filter(t=>t.field===f.field);
+  return`<div class="card" style="border:2px solid var(--line);margin-bottom:14px;">
+    <div class="card-hdr">
+      <div class="card-title">${f.id?'Edit problem':'Add problem'}</div>
+      <div class="btn-row">
+        <button class="btn sm" id="pf-cancel">Cancel</button>
+        <button class="btn sm primary" id="pf-save">Save problem</button>
+      </div>
+    </div>
+    <div class="pfg">
+      <div>
+        <div class="fg">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <label class="lbl" style="margin-bottom:0;">Question</label>
+            <div class="tab-row">
+              <button class="tab-btn${f.questionType==='image'?' active':''}" data-qtype="image">Image</button>
+              <button class="tab-btn${f.questionType==='text'?' active':''}" data-qtype="text">Text / LaTeX</button>
+            </div>
+          </div>
+          ${f.questionType==='text'?`
+            <div class="latex-hint">Inline: $x^2+1$ &nbsp;·&nbsp; Display: $$x^2+1$$</div>
+            <textarea class="block-ta" id="qtext-ta" style="border:1px solid var(--line);border-radius:12px;min-height:110px;" placeholder="Type the problem statement...">${esc(f.questionText)}</textarea>
+            <div class="nr" id="qtext-preview" style="margin-top:8px;padding:12px;background:var(--soft);border-radius:12px;min-height:24px;"></div>
+          `:`
+            <div class="dz" id="q-dz"><div><strong>Drop or click</strong><p>question image</p></div></div>
+            <input id="q-fi" type="file" accept="image/*" class="hidden" />
+            ${f.questionImage?`<div style="margin-top:8px;position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;"><img src="${f.questionImage}" style="width:100%;" /><button class="ti-rm" id="q-rm">✕</button></div>`:''}
+          `}
+        </div>
+        <div class="fg">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <label class="lbl" style="margin-bottom:0;">Solution</label>
+            <div class="tab-row">
+              <button class="tab-btn${f.solutionType==='image'?' active':''}" data-stype="image">Image</button>
+              <button class="tab-btn${f.solutionType==='text'?' active':''}" data-stype="text">Text / LaTeX</button>
+            </div>
+          </div>
+          ${f.solutionType==='text'?`
+            <div class="latex-hint">Inline: $x^2+1$ &nbsp;·&nbsp; Display: $$x^2+1$$</div>
+            <textarea class="block-ta" id="stext-ta" style="border:1px solid var(--line);border-radius:12px;min-height:110px;" placeholder="Type the solution...">${esc(f.solutionText)}</textarea>
+            <div class="nr" id="stext-preview" style="margin-top:8px;padding:12px;background:var(--soft);border-radius:12px;min-height:24px;"></div>
+          `:`
+            <div class="dz" id="s-dz"><div><strong>Drop or click</strong><p>one or more solutions</p></div></div>
+            <input id="s-fi" type="file" accept="image/*" multiple class="hidden" />
+            ${f.solutionImages.length?`<div class="tgrid">${f.solutionImages.map((src,i)=>`<div class="ti"><img src="${src}" /><button class="ti-rm" data-srm="${i}">✕</button></div>`).join('')}</div>`:''}
+          `}
+        </div>
+      </div>
+      <div class="stack">
+        <div class="fg">
+          <label class="lbl">Difficulty</label>
+          <div class="og3">${DIFFS.map(d=>`<button class="ob${f.difficulty===d?' active':''}" data-pd="${d}">${d}</button>`).join('')}</div>
+        </div>
+        <div class="fg">
+          <label class="lbl">Source type</label>
+          <select class="sel" id="pf-st"><option value="">Select</option>${SOURCES.map(s=>`<option value="${s}"${f.sourceType===s?' selected':''}>${s}</option>`).join('')}</select>
+        </div>
+        <div class="fg">
+          <label class="lbl">Source detail <span style="font-weight:400;color:var(--muted);text-transform:none;">(optional)</span></label>
+          <input class="inp" id="pf-sd" placeholder="e.g. 2023 AIME I #9" value="${esc(f.sourceDetail)}" />
+        </div>
+        <div class="fg">
+          <label class="lbl">Technique tags</label>
+          <div class="row" style="margin-bottom:8px;">
+            ${avail.length?avail.map(t=>`<button class="btn sm${f.techniqueTagIds.includes(t.id)?' active':''}" data-pt="${t.id}">${esc(t.name)}</button>`).join(''):`<span style="font-size:12px;color:var(--muted);">No tags for ${f.field}.</span>`}
+          </div>
+          <div class="row">
+            <input class="inp" id="pf-it" placeholder="New tag" value="${esc(S.inlineTag.name)}" style="flex:1 1 140px;" />
+            <button class="btn sm primary" id="pf-ita">Add</button>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="lbl">Note <span style="font-weight:400;color:var(--muted);">(optional, max 220)</span></label>
+          <textarea class="ta" id="pf-note" maxlength="220" style="min-height:70px;">${esc(f.note)}</textarea>
+          <div class="cc"><span id="pf-nc">${f.note.length}</span>/220</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── BIND FIELD ──
+function bindField(){
+  document.querySelectorAll('[data-sel-note]').forEach(el=>{
+    el.onclick=()=>{S.selNoteId=el.dataset.selNote;S.editing=false;S.probFormOpen=false;S.probSort='all';S.expanded=new Set();render();renderNoteBlocks();};
+  });
+
+  const nnBtn=document.getElementById('btn-new-note');
+  if(nnBtn)nnBtn.onclick=()=>{S.nForm=enf(S.field);S.editing=true;render();};
+
+  const nti=document.getElementById('ne-title');
+  if(nti)nti.oninput=e=>{S.nForm.title=e.target.value;};
+
+  const nc=document.getElementById('n-cancel');
+  const ns=document.getElementById('n-save');
+  if(nc)nc.onclick=()=>{S.editing=false;S.nForm=enf(S.field);render();};
+  if(ns)ns.onclick=()=>{
+    syncBlocks();
+    const now=new Date().toISOString();
+    const note={...S.nForm,id:S.nForm.id||uid('note'),field:S.field,createdAt:S.nForm.createdAt||now,updatedAt:now};
+    S.notes=[note,...S.notes.filter(n=>n.id!==note.id)];
+    S.selNoteId=note.id;S.editing=false;S.nForm=enf(S.field);
+    render();renderNoteBlocks();
+  };
+
+  // block add buttons
+  const atb=document.getElementById('add-text-block');
+  const aib=document.getElementById('add-img-block');
+  const bfi=document.getElementById('block-img-fi');
+  if(atb)atb.onclick=()=>{
+    syncBlocks();
+    S.nForm.blocks.push({type:'text',content:''});
+    render();
+  };
+  if(aib&&bfi){
+    aib.onclick=()=>bfi.click();
+    bfi.onchange=async e=>{
+      const files=Array.from(e.target.files).filter(x=>x.type.startsWith('image/'));
+      if(!files.length)return;
+      syncBlocks();
+      const urls=await Promise.all(files.map(f2url));
+      urls.forEach(src=>S.nForm.blocks.push({type:'image',src}));
+      bfi.value='';
+      render();
+    };
+  }
+
+  // block reorder/remove
+  document.querySelectorAll('[data-b-up]').forEach(b=>{
+    b.onclick=()=>{syncBlocks();const i=Number(b.dataset.bUp);if(i===0)return;const bl=S.nForm.blocks;[bl[i-1],bl[i]]=[bl[i],bl[i-1]];render();};
+  });
+  document.querySelectorAll('[data-b-dn]').forEach(b=>{
+    b.onclick=()=>{syncBlocks();const i=Number(b.dataset.bDn);const bl=S.nForm.blocks;if(i>=bl.length-1)return;[bl[i],bl[i+1]]=[bl[i+1],bl[i]];render();};
+  });
+  document.querySelectorAll('[data-b-rm]').forEach(b=>{
+    b.onclick=()=>{syncBlocks();S.nForm.blocks.splice(Number(b.dataset.bRm),1);render();};
+  });
+
+  // drag-to-reorder blocks
+  let dragIdx=null;
+  document.querySelectorAll('[data-bi]').forEach(el=>{
+    el.addEventListener('dragstart',()=>{dragIdx=Number(el.dataset.bi);});
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over');});
+    el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+    el.addEventListener('drop',e=>{
+      e.preventDefault();el.classList.remove('drag-over');
+      const to=Number(el.dataset.bi);
+      if(dragIdx===null||dragIdx===to)return;
+      syncBlocks();
+      const bl=S.nForm.blocks;
+      const [moved]=bl.splice(dragIdx,1);
+      bl.splice(to,0,moved);
+      dragIdx=null;render();
+    });
+  });
+
+  const neb=document.getElementById('n-edit-btn');
+  const ndb=document.getElementById('n-del-btn');
+  if(neb)neb.onclick=()=>{
+    const n=S.notes.find(x=>x.id===S.selNoteId);
+    if(!n)return;
+    S.nForm={...n,blocks:JSON.parse(JSON.stringify(n.blocks||[]))};
+    S.editing=true;render();
+  };
+  if(ndb)ndb.onclick=()=>{
+    if(!confirm('Delete this note and all its problems?'))return;
+    S.problems=S.problems.filter(p=>p.noteId!==S.selNoteId);
+    S.notes=S.notes.filter(n=>n.id!==S.selNoteId);
+    S.selNoteId=null;render();
+  };
+
+  document.querySelectorAll('[data-sort]').forEach(b=>{b.onclick=()=>{S.probSort=b.dataset.sort;render();renderNoteBlocks();};});
+
+  const apb=document.getElementById('btn-add-prob');
+  if(apb)apb.onclick=()=>{S.pForm=epf(S.selNoteId,S.field);S.inlineTag={name:'',field:S.field};S.probFormOpen=true;render();renderNoteBlocks();};
+
+  document.querySelectorAll('[data-p-toggle]').forEach(b=>{
+    b.onclick=()=>{const id=b.dataset.pToggle;S.expanded.has(id)?S.expanded.delete(id):S.expanded.add(id);render();renderNoteBlocks();};
+  });
+  document.querySelectorAll('[data-p-edit]').forEach(b=>{
+    b.onclick=()=>{const p=S.problems.find(x=>x.id===b.dataset.pEdit);if(!p)return;S.pForm={...p,solutionImages:[...p.solutionImages],techniqueTagIds:[...p.techniqueTagIds]};S.probFormOpen=true;render();renderNoteBlocks();};
+  });
+  document.querySelectorAll('[data-p-del]').forEach(b=>{
+    b.onclick=()=>{if(!confirm('Delete this problem?'))return;S.problems=S.problems.filter(p=>p.id!==b.dataset.pDel);render();renderNoteBlocks();};
+  });
+
+  bindPF();
+  renderNoteBlocks();
+}
+
+function syncBlocks(){
+  // sync textarea contents back to state before re-render
+  document.querySelectorAll('[data-b-ta]').forEach(ta=>{
+    const i=Number(ta.dataset.bTa);
+    if(S.nForm.blocks[i])S.nForm.blocks[i].content=ta.value;
+  });
+  const ti=document.getElementById('ne-title');
+  if(ti)S.nForm.title=ti.value;
+}
+
+function renderNoteBlocks(){
+  // render KaTeX into note view text blocks + problem question/solution text (cards, library, form preview)
+  setTimeout(()=>{
+    const note=S.notes.find(n=>n.id===S.selNoteId);
+    if(note){
+      document.querySelectorAll('[data-view-text]').forEach(el=>{
+        const i=Number(el.dataset.viewText);
+        const block=(note.blocks||[])[i];
+        if(block&&block.type==='text'){
+          el.textContent=block.content||'';
+          rk(el);
+        }
+      });
+    }
+    document.querySelectorAll('[data-prob-qtext]').forEach(el=>{
+      const p=S.problems.find(x=>x.id===el.dataset.probQtext);
+      if(p){el.textContent=p.questionText||'';rk(el);}
+    });
+    document.querySelectorAll('[data-prob-stext]').forEach(el=>{
+      const p=S.problems.find(x=>x.id===el.dataset.probStext);
+      if(p){el.textContent=p.solutionText||'';rk(el);}
+    });
+    const qPrev=document.getElementById('qtext-preview');
+    if(qPrev){qPrev.textContent=S.pForm.questionText||'';rk(qPrev);}
+    const sPrev=document.getElementById('stext-preview');
+    if(sPrev){sPrev.textContent=S.pForm.solutionText||'';rk(sPrev);}
+  },0);
+}
+
+// ── PROBLEM FORM BIND ──
+function bindPF(){
+  const pc=document.getElementById('pf-cancel');
+  const ps=document.getElementById('pf-save');
+  if(!pc||!ps)return;
+  pc.onclick=()=>{S.probFormOpen=false;render();renderNoteBlocks();};
+  ps.onclick=()=>{
+    const f=S.pForm;
+    const miss=[];
+    const hasQ=f.questionType==='text'?!!f.questionText.trim():!!f.questionImage;
+    const hasS=f.solutionType==='text'?!!f.solutionText.trim():f.solutionImages.length>0;
+    if(!hasQ)miss.push('question (image or text)');
+    if(!hasS)miss.push('solution (image or text)');
+    if(!f.difficulty)miss.push('difficulty');
+    if(!f.sourceType)miss.push('source type');
+    if(miss.length){alert('Missing: '+miss.join(', '));return;}
+    const now=new Date().toISOString();
+    const prob={...f,id:f.id||uid('prob'),sourceDetail:f.sourceDetail.trim(),note:f.note.trim(),createdAt:f.createdAt||now,updatedAt:now};
+    S.problems=[prob,...S.problems.filter(p=>p.id!==prob.id)];
+    S.probFormOpen=false;render();renderNoteBlocks();
+  };
+
+  document.querySelectorAll('[data-qtype]').forEach(b=>{
+    b.onclick=()=>{S.pForm.questionType=b.dataset.qtype;render();renderNoteBlocks();};
+  });
+  document.querySelectorAll('[data-stype]').forEach(b=>{
+    b.onclick=()=>{S.pForm.solutionType=b.dataset.stype;render();renderNoteBlocks();};
+  });
+  const qta=document.getElementById('qtext-ta');
+  if(qta)qta.oninput=e=>{
+    S.pForm.questionText=e.target.value;
+    const prev=document.getElementById('qtext-preview');
+    if(prev){prev.textContent=e.target.value;rk(prev);}
+  };
+  const sta=document.getElementById('stext-ta');
+  if(sta)sta.oninput=e=>{
+    S.pForm.solutionText=e.target.value;
+    const prev=document.getElementById('stext-preview');
+    if(prev){prev.textContent=e.target.value;rk(prev);}
+  };
+
+  document.querySelectorAll('[data-pd]').forEach(b=>{b.onclick=()=>{S.pForm.difficulty=b.dataset.pd;render();renderNoteBlocks();};});
+
+  const st=document.getElementById('pf-st');
+  const sd=document.getElementById('pf-sd');
+  const pn=document.getElementById('pf-note');
+  if(st)st.onchange=e=>{S.pForm.sourceType=e.target.value;};
+  if(sd)sd.oninput=e=>{S.pForm.sourceDetail=e.target.value;};
+  if(pn)pn.oninput=e=>{S.pForm.note=e.target.value.slice(0,220);const c=document.getElementById('pf-nc');if(c)c.textContent=S.pForm.note.length;};
+
+  document.querySelectorAll('[data-pt]').forEach(b=>{
+    b.onclick=()=>{const id=b.dataset.pt;S.pForm.techniqueTagIds.includes(id)?S.pForm.techniqueTagIds=S.pForm.techniqueTagIds.filter(x=>x!==id):S.pForm.techniqueTagIds.push(id);render();renderNoteBlocks();};
+  });
+
+  const iti=document.getElementById('pf-it');
+  const ita=document.getElementById('pf-ita');
+  if(iti)iti.oninput=e=>{S.inlineTag.name=e.target.value;};
+  if(ita)ita.onclick=()=>{
+    const name=S.inlineTag.name.trim();if(!name)return;
+    const field=S.pForm.field;
+    const dup=S.tags.find(t=>t.field===field&&t.name.toLowerCase()===name.toLowerCase());
+    const tag=dup||{id:uid('tag'),name,field};
+    if(!dup)S.tags=[...S.tags,tag].sort((a,b)=>a.name.localeCompare(b.name));
+    if(!S.pForm.techniqueTagIds.includes(tag.id))S.pForm.techniqueTagIds.push(tag.id);
+    S.inlineTag={name:'',field};render();renderNoteBlocks();
+  };
+
+  const qr=document.getElementById('q-rm');
+  if(qr)qr.onclick=()=>{S.pForm.questionImage='';render();renderNoteBlocks();};
+  document.querySelectorAll('[data-srm]').forEach(b=>{b.onclick=()=>{S.pForm.solutionImages.splice(Number(b.dataset.srm),1);render();renderNoteBlocks();};});
+
+  const qd=document.getElementById('q-dz'),qf=document.getElementById('q-fi');
+  const sd2=document.getElementById('s-dz'),sf=document.getElementById('s-fi');
+  if(qd&&qf)bdz(qd,qf,async files=>{const f=Array.from(files).filter(x=>x.type.startsWith('image/'));if(!f.length)return;S.pForm.questionImage=await f2url(f[0]);render();renderNoteBlocks();});
+  if(sd2&&sf)bdz(sd2,sf,async files=>{const f=Array.from(files).filter(x=>x.type.startsWith('image/'));if(!f.length)return;const urls=await Promise.all(f.map(f2url));S.pForm.solutionImages.push(...urls);render();renderNoteBlocks();});
+}
+
+function bdz(zone,input,cb){
+  zone.onclick=()=>input.click();
+  zone.ondragover=e=>{e.preventDefault();zone.classList.add('over');};
+  zone.ondragleave=()=>zone.classList.remove('over');
+  zone.ondrop=async e=>{e.preventDefault();zone.classList.remove('over');await cb(e.dataTransfer.files);};
+  input.onchange=async e=>{await cb(e.target.files);input.value='';};
+}
+
+// ── LIBRARY ──
+function buildLib(){
+  const f=S.libFilters;
+  const tm=tmap();
+  const probs=S.problems.filter(p=>{
+    return(f.field==='all'||p.field===f.field)
+      &&(f.diff==='all'||p.difficulty===f.diff)
+      &&(f.src==='all'||p.sourceType===f.src)
+      &&(f.tagId==='all'||p.techniqueTagIds.includes(f.tagId));
+  });
+  return`<div class="ll">
+    <div class="card" style="align-self:start;position:sticky;top:18px;">
+      <div class="card-hdr">
+        <div class="card-title">Filters</div>
+        <button class="btn sm" id="lib-reset">Reset</button>
+      </div>
+      <div class="stack">
+        <div class="fg">
+          <label class="lbl">Field</label>
+          <div class="row">
+            <button class="btn sm${f.field==='all'?' active':''}" data-lf="all">All</button>
+            ${FIELDS.map(fi=>`<button class="btn sm${f.field===fi.v?' active':''}" data-lf="${fi.v}">${fi.v}</button>`).join('')}
+          </div>
+        </div>
+        <div class="fg">
+          <label class="lbl">Difficulty</label>
+          <div class="row">
+            <button class="btn sm${f.diff==='all'?' active':''}" data-ld="all">All</button>
+            ${DIFFS.map(d=>`<button class="btn sm${f.diff===d?' active':''}" data-ld="${d}">${d}</button>`).join('')}
+          </div>
+        </div>
+        <div class="fg">
+          <label class="lbl">Source</label>
+          <select class="sel" id="lib-src"><option value="all">All</option>${SOURCES.map(s=>`<option value="${s}"${f.src===s?' selected':''}>${s}</option>`).join('')}</select>
+        </div>
+        <div class="fg">
+          <label class="lbl">Tag</label>
+          <select class="sel" id="lib-tag"><option value="all">All</option>${S.tags.map(t=>`<option value="${t.id}"${f.tagId===t.id?' selected':''}>${esc(t.name)} (${t.field})</option>`).join('')}</select>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);">${probs.length} problem${probs.length!==1?'s':''}</div>
+      </div>
+    </div>
+    <div>
+      ${probs.length===0?`<div class="eb">No problems match.</div>`:`<div class="pstack">
+        ${probs.map(p=>{
+          const note=S.notes.find(n=>n.id===p.noteId);
+          const tags=p.techniqueTagIds.map(id=>tm[id]).filter(Boolean);
+          const exp=S.libExp.has(p.id);
+          return`<div class="pc">
+            ${probQuestionHtml(p)}
+            <div class="pc-body">
+              <div class="pc-meta">
+                <span class="fb fb${p.field}">${p.field}</span>
+                <span class="pill ${dc(p.difficulty)}">${esc(p.difficulty)}</span>
+                <span class="pill">${esc(p.sourceType)}</span>
+                ${p.sourceDetail?`<span class="pill">${esc(p.sourceDetail)}</span>`:''}
+                ${note?`<button class="btn sm ghost" data-goto="${note.id}" data-gf="${p.field}" style="padding:3px 8px;">↗ ${esc(note.title)}</button>`:''}
+              </div>
+              ${tags.length?`<div class="row" style="margin:6px 0;">${tags.map(t=>`<span class="pill">${esc(t.name)}</span>`).join('')}</div>`:''}
+              ${p.note?`<div style="font-size:13px;color:#475569;line-height:1.6;">${esc(p.note)}</div>`:''}
+            </div>
+            <button class="pc-toggle" data-le="${p.id}">${exp?'▲ Hide solution':'▼ Show solution'} (${probSolutionCount(p)})</button>
+            ${exp?probSolutionDetailHtml(p):''}
+          </div>`;
+        }).join('')}
+      </div>`}
+    </div>
+  </div>`;
+}
+
+function bindLib(){
+  document.getElementById('lib-reset').onclick=()=>{S.libFilters={field:'all',diff:'all',src:'all',tagId:'all'};render();};
+  document.querySelectorAll('[data-lf]').forEach(b=>{b.onclick=()=>{S.libFilters.field=b.dataset.lf;render();};});
+  document.querySelectorAll('[data-ld]').forEach(b=>{b.onclick=()=>{S.libFilters.diff=b.dataset.ld;render();};});
+  const ls=document.getElementById('lib-src'),lt=document.getElementById('lib-tag');
+  if(ls)ls.onchange=e=>{S.libFilters.src=e.target.value;render();};
+  if(lt)lt.onchange=e=>{S.libFilters.tagId=e.target.value;render();};
+  document.querySelectorAll('[data-le]').forEach(b=>{b.onclick=()=>{const id=b.dataset.le;S.libExp.has(id)?S.libExp.delete(id):S.libExp.add(id);render();};});
+  document.querySelectorAll('[data-goto]').forEach(b=>{
+    b.onclick=()=>{const field=b.dataset.gf,noteId=b.dataset.goto;S.field=field;S.selNoteId=noteId;S.editing=false;S.probFormOpen=false;nav(field);};
+  });
+  renderNoteBlocks();
+}
+
+// ── TAGS ──
+function buildTags(){
+  return`<div class="stack">
+    <div style="font-size:22px;font-weight:700;letter-spacing:-.02em;">Tag manager</div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Create tag</div></div>
+      <div class="row">
+        <input class="inp" id="tn-inp" placeholder="Tag name" value="${esc(S.tagDraft.name)}" style="flex:1 1 220px;" />
+        <select class="sel" id="tf-sel" style="width:100px;">${FIELDS.map(f=>`<option value="${f.v}"${S.tagDraft.field===f.v?' selected':''}>${f.v}</option>`).join('')}</select>
+        <button class="btn primary" id="tc-btn">Add</button>
+      </div>
+    </div>
+    <div class="tg2">
+      ${FIELDS.map(f=>{
+        const g=S.tags.filter(t=>t.field===f.v);
+        return`<div class="card">
+          <div class="card-hdr"><div><span class="fb fb${f.v}">${f.v}</span> <span class="card-title" style="display:inline;">${f.l}</span></div><div class="card-sub">${g.length} tag${g.length!==1?'s':''}</div></div>
+          ${g.length?g.map(t=>`<div class="tri"><input class="inp" value="${esc(t.name)}" data-tr="${t.id}" /><button class="btn sm" data-ts="${t.id}">Save</button><button class="btn sm danger" data-td="${t.id}">✕</button></div>`).join(''):`<div class="eb">No tags yet.</div>`}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function bindTags(){
+  const ni=document.getElementById('tn-inp'),fs=document.getElementById('tf-sel'),cb=document.getElementById('tc-btn');
+  if(ni)ni.oninput=e=>{S.tagDraft.name=e.target.value;};
+  if(fs)fs.onchange=e=>{S.tagDraft.field=e.target.value;};
+  if(cb)cb.onclick=()=>{
+    const name=S.tagDraft.name.trim();if(!name)return;
+    const field=S.tagDraft.field;
+    const dup=S.tags.find(t=>t.field===field&&t.name.toLowerCase()===name.toLowerCase());
+    if(!dup)S.tags=[...S.tags,{id:uid('tag'),name,field}].sort((a,b)=>a.name.localeCompare(b.name));
+    S.tagDraft.name='';render();
+  };
+  document.querySelectorAll('[data-ts]').forEach(b=>{
+    b.onclick=()=>{
+      const id=b.dataset.ts,inp=document.querySelector(`[data-tr="${id}"]`);
+      const name=inp.value.trim();if(!name)return;
+      const ex=S.tags.find(t=>t.id===id);if(!ex)return;
+      const dup=S.tags.find(t=>t.id!==id&&t.field===ex.field&&t.name.toLowerCase()===name.toLowerCase());
+      if(dup){alert('Name already exists.');return;}
+      S.tags=S.tags.map(t=>t.id===id?{...t,name}:t).sort((a,b)=>a.name.localeCompare(b.name));render();
+    };
+  });
+  document.querySelectorAll('[data-td]').forEach(b=>{
+    b.onclick=()=>{
+      if(!confirm('Delete tag?'))return;
+      const id=b.dataset.td;
+      S.tags=S.tags.filter(t=>t.id!==id);
+      S.problems=S.problems.map(p=>({...p,techniqueTagIds:p.techniqueTagIds.filter(x=>x!==id)}));
+      render();
+    };
+  });
+}
+
+// ── GITHUB BACKUP ──
+// Config (token/owner/repo/path) lives in its OWN localStorage key, entirely separate
+// from notebook data — it is never included in Export JSON, Share as HTML, or IndexedDB.
+const GH_CONFIG_KEY='math_notebook_github_v1';
+
+function ghLoadConfig(){
+  try{return JSON.parse(localStorage.getItem(GH_CONFIG_KEY))||{};}catch{return{};}
+}
+function ghSaveConfig(cfg){
+  try{localStorage.setItem(GH_CONFIG_KEY,JSON.stringify(cfg));}catch{}
+}
+function utf8ToB64(str){return btoa(unescape(encodeURIComponent(str)));}
+function b64ToUtf8(str){return decodeURIComponent(escape(atob(str)));}
+
+async function ghApi(path,cfg,options={}){
+  return fetch('https://api.github.com'+path,{
+    ...options,
+    headers:{
+      'Authorization':'Bearer '+cfg.token,
+      'Accept':'application/vnd.github+json',
+      ...(options.headers||{}),
+    },
+  });
+}
+async function ghGetFile(cfg){
+  const res=await ghApi(`/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(cfg.path)}?ref=${encodeURIComponent(cfg.branch||'main')}`,cfg);
+  if(res.status===404)return null;
+  if(!res.ok)throw new Error('GitHub error '+res.status+': '+(await res.text()).slice(0,200));
+  return res.json();
+}
+
+async function ghPush(){
+  const cfg=ghLoadConfig();
+  if(!cfg.token||!cfg.owner||!cfg.repo||!cfg.path){alert('Fill in and save GitHub settings first.');return;}
+  try{
+    const existing=await ghGetFile(cfg);
+    const json=JSON.stringify({notes:S.notes,problems:S.problems,tags:S.tags},null,2);
+    const body={message:'Math notebook backup — '+new Date().toISOString(),content:utf8ToB64(json),branch:cfg.branch||'main'};
+    if(existing)body.sha=existing.sha;
+    const res=await ghApi(`/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(cfg.path)}`,cfg,{
+      method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),
+    });
+    if(!res.ok)throw new Error('Push failed ('+res.status+'): '+(await res.text()).slice(0,200));
+    cfg.lastPushedAt=Date.now();ghSaveConfig(cfg);
+    renderGithubStatus();
+    alert('Pushed to GitHub.');
+  }catch(err){alert(err.message);}
+}
+
+async function ghPull(){
+  const cfg=ghLoadConfig();
+  if(!cfg.token||!cfg.owner||!cfg.repo||!cfg.path){alert('Fill in and save GitHub settings first.');return;}
+  try{
+    const file=await ghGetFile(cfg);
+    if(!file){alert('No backup file found at that path yet. Push first.');return;}
+    const json=b64ToUtf8(file.content.replace(/\n/g,''));
+    const data=JSON.parse(json);
+    if(!data||!Array.isArray(data.notes)||!Array.isArray(data.problems)||!Array.isArray(data.tags)){
+      alert('That file does not look like a Math Notebook backup.');return;
+    }
+    const ok=confirm(
+      'Pulling will REPLACE everything currently in the notebook ('+S.notes.length+' notes, '+S.problems.length+' problems) '+
+      'with the GitHub backup ('+data.notes.length+' notes, '+data.problems.length+' problems). This cannot be undone.\n\nContinue?'
+    );
+    if(!ok)return;
+    S.notes=data.notes;S.problems=data.problems;S.tags=data.tags||[];
+    S.selNoteId=null;S.editing=false;S.probFormOpen=false;
+    cfg.lastPulledAt=Date.now();ghSaveConfig(cfg);
+    persist();
+    nav(S.field);
+  }catch(err){alert(err.message);}
+}
+
+function buildGithub(){
+  const cfg=ghLoadConfig();
+  return`<div class="stack">
+    <div style="font-size:22px;font-weight:700;letter-spacing:-.02em;">GitHub backup</div>
+
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Setup</div></div>
+      <div class="fg">
+        <label class="lbl">Personal access token</label>
+        <input class="inp" id="gh-token" type="password" placeholder="github_pat_..." value="${esc(cfg.token||'')}" />
+      </div>
+      <div class="fg">
+        <label class="lbl">Repo owner</label>
+        <input class="inp" id="gh-owner" placeholder="your-username" value="${esc(cfg.owner||'')}" />
+      </div>
+      <div class="fg">
+        <label class="lbl">Repo name</label>
+        <input class="inp" id="gh-repo" placeholder="math-notebook-backup" value="${esc(cfg.repo||'')}" />
+      </div>
+      <div class="fg">
+        <label class="lbl">File path</label>
+        <input class="inp" id="gh-path" placeholder="notebook-backup.json" value="${esc(cfg.path||'notebook-backup.json')}" />
+      </div>
+      <div class="fg">
+        <label class="lbl">Branch</label>
+        <input class="inp" id="gh-branch" placeholder="main" value="${esc(cfg.branch||'main')}" />
+      </div>
+      <button class="btn primary" id="gh-save">Save settings</button>
+      <div class="eb" style="margin-top:12px;">
+        The token stays in this browser only. It is never included in Export JSON or Share as HTML.
+        Create one at <span style="font-family:'DM Mono',monospace;">github.com/settings/personal-access-tokens/new</span>
+        — fine-grained, scoped to just this one repo, with "Contents" read and write permission and nothing else.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Backup</div></div>
+      <div class="row" style="margin-bottom:10px;">
+        <button class="btn primary" id="gh-push">⇪ Push to GitHub</button>
+        <button class="btn" id="gh-pull">⇩ Pull from GitHub</button>
+      </div>
+      <div id="gh-status" style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">
+        Last pushed: ${fmtAgo(cfg.lastPushedAt)} · Last pulled: ${fmtAgo(cfg.lastPulledAt)}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">Host on GitHub Pages</div>
+          <div class="card-sub">a stable link that always opens, from any device</div>
+        </div>
+      </div>
+      <ol style="padding-left:20px;line-height:2;font-size:13px;color:#374151;">
+        <li>Create a public GitHub repo (or use the one above).</li>
+        <li>Click "Share as HTML" in the top bar, then upload that file to the repo, renamed to <span style="font-family:'DM Mono',monospace;">index.html</span>.</li>
+        <li>In the repo: Settings → Pages → Source → pick your branch → Save.</li>
+        <li>The notebook is now live at <span style="font-family:'DM Mono',monospace;">https://your-username.github.io/repo-name/</span> — open it from any device.</li>
+      </ol>
+      <div class="eb" style="margin-top:10px;">
+        Each browser that opens this URL keeps its own local copy of the data (auto-save doesn't sync across devices by itself). Use Push/Pull above to move data between them.
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderGithubStatus(){
+  const el=document.getElementById('gh-status');
+  const cfg=ghLoadConfig();
+  if(el)el.textContent=`Last pushed: ${fmtAgo(cfg.lastPushedAt)} · Last pulled: ${fmtAgo(cfg.lastPulledAt)}`;
+}
+
+function bindGithub(){
+  const saveBtn=document.getElementById('gh-save');
+  if(saveBtn)saveBtn.onclick=()=>{
+    const cfg=ghLoadConfig();
+    cfg.token=document.getElementById('gh-token').value.trim();
+    cfg.owner=document.getElementById('gh-owner').value.trim();
+    cfg.repo=document.getElementById('gh-repo').value.trim();
+    cfg.path=document.getElementById('gh-path').value.trim()||'notebook-backup.json';
+    cfg.branch=document.getElementById('gh-branch').value.trim()||'main';
+    ghSaveConfig(cfg);
+    alert('GitHub settings saved.');
+  };
+  const pushBtn=document.getElementById('gh-push');
+  const pullBtn=document.getElementById('gh-pull');
+  if(pushBtn)pushBtn.onclick=ghPush;
+  if(pullBtn)pullBtn.onclick=ghPull;
+}
+
+// ── INIT ──
+async function boot(){
+  document.getElementById('vroot').innerHTML='<div class="eb" style="padding:24px;text-align:center;">Loading notebook…</div>';
+  const data=await loadInitialData();
+  S.notes=data.notes;S.problems=data.problems;S.tags=data.tags;
+  await refreshStorageEstimate();
+  S.katexOk=await ensureKatex();
+  renderKatexBanner();
+  renderStatusBar();
+  nav('A');
+}
+document.querySelectorAll('[data-nav]').forEach(b=>{b.onclick=()=>nav(b.dataset.nav);});
+document.getElementById('btn-save').onclick=shareAsHtml;
+setInterval(renderStatusBar,30000); // keep "X ago" text fresh
+boot();
+</script>
+</body>
+</html>
